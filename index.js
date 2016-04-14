@@ -9,7 +9,7 @@ function extend(SubClass, MainClass) {
 //this method gets a sub class, and sets the calling context class as the main one for the sub prototype
 function extendClass(SubClass) {
     if (!SubClass) {
-        return createSubClass.call(this);
+        return subClass.call(this);
     }
     var SubClassExtended = extend(SubClass, this);
     SubClassExtended.extendClass = extendClass;
@@ -19,7 +19,9 @@ function extendClass(SubClass) {
 
 //this method creates a new class and sets the current calling context class as the main class for it.
 function subClass() {
-    var SubClass = function () {};
+    var SubClass = function () {
+      this.parentConstructor.apply(this, arguments);
+    };
     return extendClass.call(this, SubClass);
 }
 
@@ -31,9 +33,13 @@ function OOP() {
 
 // Allows to call parent constructor from sub constructors. i.e. this.parentConstructor()
 OOP.prototype.parentConstructor = function () {
-    if (this.__proto__ && this.__proto__.__proto__) {
-        return this.__proto__.__proto__.constructor.apply(this.__proto__, arguments);
-    }
+
+    //get arguments list
+    var args = Array.prototype.slice.call(arguments);
+    args.unshift('constructor');
+
+    return this.parentMethod.apply(this, args);
+
 };
 
 // Allows to call a parent method from sub classes after they are overridden. i.e. this.parentMethod(methodName, param1, param2, ...);
@@ -41,12 +47,59 @@ OOP.prototype.parentMethod = function (method) {
     if (!method) {
         throw 'What method to call in parent?';
     }
-    if (!(this.__proto__ && this.__proto__.__proto__)) {
-        throw 'No parent to call method ' + method + ' in!';
-    }
+
+    //get arguments list
     var args = Array.prototype.slice.call(arguments);
     args.shift();
-    return this.__proto__.__proto__[method].apply(this.__proto__, args);
+
+    //checks if a method is an instuctor in current object stack
+    function isConstructor(method){
+      var parent = this;
+      do {
+        if(parent.constructor===method){
+          return true;
+        }
+        parent = parent.__proto__;
+      } while(parent);
+      return false;
+    }
+
+    //find overriding calling method
+    var callingMethod = arguments.callee.caller;
+    while(callingMethod){
+      if(callingMethod.name===method || method==='constructor' && isConstructor.call(this, callingMethod)){
+        break;
+      }
+      callingMethod = callingMethod.caller;
+    }
+    if(!callingMethod) {
+      throw 'Calling parent method from outside method context';
+    }
+
+    //find called method
+    var found = false, parent = this, calledMethod;
+    if(typeof callingMethod !== 'function'){
+      throw 'Calling parent method from a normal context!';
+    }
+    while(parent){
+      if(parent.hasOwnProperty(method) || method==='constructor'){
+        if(found && (method==='constructor' && callingMethod !== parent.constructor || method!=='constructor')){
+          calledMethod = method==='constructor' ? parent.constructor : parent[method];
+          break;
+        } else if( parent[method] === callingMethod || method==='constructor' && callingMethod === parent.constructor) {
+          found = true;
+        }
+      }
+      parent = parent.__proto__;
+    }
+
+    //if no called method found
+    if(!calledMethod){
+      throw 'Method ' + method + ' not found in parent levels!';
+    }
+
+    //call the parent method
+    return calledMethod.apply(this, args);
 };
 
 // Allows to call parent method directly without the name. Named methods should be used to define methods.
@@ -54,6 +107,9 @@ OOP.prototype.parentMethod = function (method) {
 // Calling example: SubClass.prototype.talk = function talk(param1, param2){ this.propagateCall(param1); ... }; //this will call the parent talk method with param1 passed
 OOP.prototype.propagateCall = function () {
     var method = arguments.callee.caller.name;
+    if(!method){
+      throw 'Can not propagate method call for unnamed methods. Use named functions to use this method.';
+    }
     var args = Array.prototype.slice.call(arguments || []);
     args.unshift(method);
     return this.parentMethod.apply(this, args);
@@ -62,6 +118,7 @@ OOP.prototype.propagateCall = function () {
 // Add inheritence methods
 OOP.extendClass = extendClass;
 OOP.subClass = subClass;
+OOP.extendTo = extend;
 
 //end
-exports = OOP;
+module.exports = OOP;
