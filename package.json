@@ -1,0 +1,25 @@
+{
+  "name": "js-simple-oop",
+  "version": "1.0.0",
+  "description": "Simple OOP inheritence implementation for JavaScript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itvisionsy/js-simple-oop.git"
+  },
+  "keywords": [
+    "OOP",
+    "JS",
+    "Class",
+    "Inheritance"
+  ],
+  "author": "Muhannad Shelleh <muhannad.shelleh.live.com> (http://al-shehab.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/itvisionsy/js-simple-oop/issues"
+  },
+  "homepage": "https://github.com/itvisionsy/js-simple-oop#readme"
+}
