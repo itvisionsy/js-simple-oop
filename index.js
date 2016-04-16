@@ -5,6 +5,7 @@ function extend(SubClass, MainClass) {
     SubClass.prototype.__proto__ = MainClass.prototype;
     SubClass.extendClass = extendClass;
     SubClass.defineMethod = defineMethod;
+    SubClass.defineProperty = defineProperty;
     return SubClass;
 }
 
@@ -41,15 +42,23 @@ function defineMethod(methodCallback, methodName) {
 
 };
 
+//allows to define a property with setter and getter
+function defineProperty(property, getter, setter, descriptors){
+  descriptors = descriptors || {};
+  descriptors.get = descriptors.get || getter || undefined;
+  descriptors.set = descriptors.set || setter || undefined;
+  Object.defineProperty(this.prototype, property, descriptors);
+}
+
 /**** THE MAIN OOP CLASS ****/
 
 var OOP;
 
 (function(){
 
-  function OOP() {
+  OOP = function OOP() {
 
-  }
+  };
 
   // Allows to call parent constructor from sub constructors. i.e. this.parentConstructor()
   OOP.prototype.parentConstructor = function () {
@@ -137,7 +146,7 @@ var OOP;
 
   // Add inheritence methods
   OOP.extendClass = extendClass;
-  OOP.extendTo = extend;
+  OOP.extend = extend;
 
 })();
 

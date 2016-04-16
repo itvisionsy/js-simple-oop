@@ -19,13 +19,13 @@ var Human = IntelligentCreature.extendClass(function(name, age){
 
 
 //Add a method to LivingCreature
-LivingCreature.prototype.identify = function identify(){
+LivingCreature.defineMethod(function identify(){
   if(this.age){
     return 'I am alive for ' + this.age + ' years now! ';
   } else {
     return 'I will not tell you my age. Try to guess it :) ';
   }
-};
+});
 
 //Add a method which calls another method
 LivingCreature.prototype.welcome = function welcome(){
@@ -49,7 +49,7 @@ IntelligentCreature.prototype.identify = function identify(){
 };
 
 //Add a method to Human
-Human.prototype.identify = function identify(){
+Human.defineMethod(function identify(){
 
   return 'My name is '+ this.name +'! ' +
       //calling parent identify method
@@ -60,7 +60,7 @@ Human.prototype.identify = function identify(){
       ( this.iqScore() > 100 ? 'high at ' : ( this.iqScore() < 50 ? 'low at ' : 'normal at ' )) +
       this.iqScore() + '. ';
 
-};
+});
 
 //Creating objects
 var tree = new LivingCreature();
