@@ -40,6 +40,8 @@ function defineMethod(methodCallback, methodName) {
 
     this.prototype[methodName] = methodCallback;
 
+    return this;
+
 };
 
 //allows to define a property with setter and getter
@@ -48,6 +50,7 @@ function defineProperty(property, getter, setter, descriptors){
   descriptors.get = descriptors.get || getter || undefined;
   descriptors.set = descriptors.set || setter || undefined;
   Object.defineProperty(this.prototype, property, descriptors);
+  return this;
 }
 
 /**** THE MAIN OOP CLASS ****/
